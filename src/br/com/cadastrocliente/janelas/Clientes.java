@@ -13,6 +13,7 @@ import javax.swing.border.LineBorder;
 import javax.swing.text.MaskFormatter;
 
 import br.com.cadastrocliente.banco.DAO;
+import br.com.cadastrocliente.dominio.Cidade;
 import br.com.cadastrocliente.dominio.Estado;
 import br.com.cadastrocliente.enums.Sexo;
 import br.com.cadastrocliente.enums.Status;
@@ -20,6 +21,8 @@ import br.com.cadastrocliente.enums.TiposLogradouro;
 
 import java.awt.Color;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JFormattedTextField;
@@ -44,7 +47,6 @@ public class Clientes extends JFrame {
 	private JTextField txtNumero;
 	private JTextField txtComplemento;
 	private JTextField txtBairro;
-	private JTextField textField_5;
 	private JTextField txtCep;
 	private JTextField txtPontoDeReferencia;
 	private JTextField textField_3;
@@ -269,15 +271,30 @@ public class Clientes extends JFrame {
 		lblEstado.setBounds(322, 62, 48, 14);
 		pnlEndereco.add(lblEstado);
 		
-		textField_5 = new JTextField();
-		textField_5.setColumns(10);
-		textField_5.setBounds(485, 77, 214, 20);
-		pnlEndereco.add(textField_5);
 		
+		int es = 1;
 		//Estados
 		DAO dao = new DAO();
 		//Pega os dados do MySQL
+		
+		//QUANDO EU FOR MANIPULAR O ESTADO, A CIDADE JA EXISTE
+		JComboBox comboCidade = new JComboBox();
 		JComboBox comboEstado = new JComboBox();
+		
+		comboEstado.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				int est = comboEstado.getSelectedIndex() + 1; 
+				//TODA VEZ QUE SELECIONAR, PEGA A POSIÇÃO
+				
+				comboCidade.removeAllItems();//LIMPAR A CAIXA DAS CIDADES
+				
+				for(Cidade c : dao.listarCidades(est)) {
+					comboCidade.addItem(c.getNome());
+				}
+				 
+			}
+		});
 		
 		for(Estado e : dao.todos()) {
 			comboEstado.addItem(e.getNome());
@@ -307,6 +324,10 @@ public class Clientes extends JFrame {
 		txtPontoDeReferencia.setBounds(160, 124, 539, 20);
 		pnlEndereco.add(txtPontoDeReferencia);
 		txtPontoDeReferencia.setColumns(10);
+		
+		
+		comboCidade.setBounds(485, 76, 146, 22);
+		pnlEndereco.add(comboCidade);
 		
 		JLabel lblEndereco = new JLabel("Endere\u00E7o");
 		lblEndereco.setBounds(21, 299, 177, 14);

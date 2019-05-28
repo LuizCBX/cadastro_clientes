@@ -8,25 +8,29 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.cadastrocliente.dominio.Cidade;
 import br.com.cadastrocliente.dominio.Estado;
 
 public class DAO {
 	
-	//Criar Lista
+	//Criar Lista ESTADO
 	public List<Estado> todos(){
 		List<Estado> lista = new ArrayList<Estado>();
-		Connection co = null;//Estabelecer conexao com o banco de dados MYSQL
-		PreparedStatement pst = null;
-		ResultSet rs = null;
+
+		Connection cn = null; //ESTABELECE CONEXAO COM BANDO DE DADOS
+		PreparedStatement pst = null; //EXECUTAR CONSULTAS SQL, (USADO PARA FAZER  CRUD)
+		ResultSet rs =  null;//GUARDAR RESULTADOS DO SELECT
 		
+		
+		//ESTADO
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 			
-			co = DriverManager.getConnection("jdbc:mysql://localhost:3306/estadoscidadesdb?serverTimezone=UTC","root","");
+			cn = DriverManager.getConnection("jdbc:mysql://localhost:3306/estadoscidadesdb?serverTimezone=UTC","root","");
 			
 			String consulta = "Select * from estado";
 			
-			pst = co.prepareStatement(consulta);
+			pst = cn.prepareStatement(consulta);
 			
 			rs = pst.executeQuery();
 			
@@ -53,8 +57,59 @@ public class DAO {
 		}
 		//Fecha conexão com Banco de dados
 		finally {
-			try {co.close();}catch(Exception e) {e.printStackTrace();}
+			try {cn.close();}catch(Exception e) {e.printStackTrace();}
 		}
 		return lista;
 	}
+	
+	
+	//CIDADES
+	public List<Cidade> listarCidades(int id){
+		
+		Connection cn = null; //ESTABELECE CONEXAO COM BANDO DE DADOS
+		PreparedStatement pst = null; //EXECUTAR CONSULTAS SQL, (USADO PARA FAZER  CRUD)
+		ResultSet rs =  null;//GUARDAR RESULTADOS DO SELECT
+		
+		List<Cidade> lista = new ArrayList<Cidade>();
+		
+		try {
+			Class.forName("com.mysql.cj.jdbc.Driver").newInstance();//CARREGAR O DRIVER DE COMUNICAÇÃO SQL
+			
+			//CHAMAR GERENCIADOR
+			cn =  DriverManager.getConnection("jdbc:mysql://localhost:3306/estadoscidadesdb?serverTimezone=UTC", "root","");
+			
+			//CONSULTA
+			String consulta = "Select * from cidade where estado=?";
+			
+			//PREPARANDO PARA EXECUTAR
+			pst = cn.prepareStatement(consulta);
+			
+			pst.setInt(1, id); 
+			
+			//EXECUTA A CONSULTA E O QUE VEM DE RETORNO VAI PARA O (rs)
+			rs = pst.executeQuery();
+			
+			//CRIAR A LISTA
+			while(rs.next()) {
+				lista.add(new Cidade(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getInt(3)
+						));
+			}
+		}
+		//SÃO DOIS CATCH
+		catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			try {cn.close();}catch(Exception e) {e.printStackTrace();}
+		}
+		return lista;
+	}
+	
 }
